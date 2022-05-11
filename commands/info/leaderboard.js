@@ -3,7 +3,7 @@ const { LismLogin } = require("../../util/functions")
 
 const CreateRole = async (roleName, colour, perms, message) => {
     if (message.guild.roles.cache.find(role => role.name == roleName)) {
-        //The role already exists
+        // The role already exists
         message.channel.send(roleName + " already exists!");
         return;
     }
@@ -17,6 +17,7 @@ const CreateRole = async (roleName, colour, perms, message) => {
      })
      .catch(console.error); 
 }
+
 const getLeaderboard = async function(page, term_url){
     await page.goto(term_url);
     // TODO have a date arg for the leaderboard
@@ -81,15 +82,16 @@ module.exports = {
                 show_leaderboard = false;
             }
         }
+        
         await LismLogin(page, URL)
+        
         // message.guild.members.find(member => console.log(member.nickname));
-        if(allTerms) {
+        if (allTerms) {
             //TODO when t3 comes out add it in
             username_arr = await getLeaderboard(page, "https://moodle.oeclism.catholic.edu.au/course/recent.php?id=896");
             // needs await others it gives back a problem, took me bloody hours to figure out
             username_arr.push(...await getLeaderboard(page, "https://moodle.oeclism.catholic.edu.au/course/recent.php?id=897"));
-        } 
-        else {
+        } else {
             username_arr = await getLeaderboard(page, URL);
         }
 
@@ -112,8 +114,10 @@ module.exports = {
         for(let i = 0; i < sortedNamesCount.length; i++){
             leaderboardString += "\n" + sortedNamesCount[i][0] + " : " + sortedNamesCount[i][1];
         }
-        if(show_leaderboard)
+
+        if (show_leaderboard) {
             message.channel.send(leaderboardString);
+        }
         
         if (createRoles){
             CreateRole("SDD KING", "#F83E0C", 0, message);
@@ -222,7 +226,14 @@ module.exports = {
             }
         }
     }
-} 
+}
+
+function GetName(unknownNickname, customNicknames){
+    for(nickname in customNicknames){
+        if(nickname == unknownNickname) return customNicknames[nickname];
+    }
+    return unknownNickname;
+}
 
 function RemoveRoles(message) {
     message.guild.roles.cache.each(role => {
