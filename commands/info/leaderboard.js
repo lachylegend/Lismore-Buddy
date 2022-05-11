@@ -1,4 +1,5 @@
 const puppeteer = require('puppeteer');
+const { MessageEmbed } = require('discord.js');
 const { LismLogin } = require("../../util/functions")
 
 const CreateRole = async (roleName, colour, perms, message) => {
@@ -44,7 +45,7 @@ module.exports = {
     run: async ({client, message, args}) => {
         const browser = await puppeteer.launch();
         const page = await browser.newPage();
-        var leaderboardString = "The all time leaderboard for 'assignments handed in' is: ";
+        var leaderboardEmbed = new MessageEmbed()
         var allTerms = true;
         var setRoles = false;
         var createRoles = false;
@@ -56,17 +57,17 @@ module.exports = {
             let arg = args[i].toLowerCase();
             arg = arg.replace("-", "");
             if(arg == "t1"){
-                leaderboardString = "The term 1 leaderboard for 'assignments handed in' is: ";
+                leaderboardEmbed.setTitle("Term 1 Assignment Leaderboard")
                 URL = "https://moodle.oeclism.catholic.edu.au/course/recent.php?id=896";
                 allTerms = false;
             }
             else if(arg == "t2"){
-                leaderboardString = "The term 2 leaderboard for 'assignments handed in' is: ";
+                leaderboardEmbed.setTitle("Term 2 Assignment Leaderboard")
                 URL = "https://moodle.oeclism.catholic.edu.au/course/recent.php?id=897";
                 allTerms = false;
             }
             else if(arg == "t3"){
-                leaderboardString = "The term 3 leaderboard for assignments done is: ";
+                leaderboardEmbed.setTitle("Term 3 Assignment Leaderboard")
                 URL = "https://moodle.oeclism.catholic.edu.au/course/recent.php?id=898";
             } 
 
@@ -110,10 +111,16 @@ module.exports = {
             return second[1] - first[1];
         });
         
+        var leaderboardString = ""
+
         //const guild = await client.guilds.fetch('940133396775075880')
         for(let i = 0; i < sortedNamesCount.length; i++){
-            leaderboardString += "\n" + sortedNamesCount[i][0] + " : " + sortedNamesCount[i][1];
+            leaderboardString += (i + 1).toString() + ". **" + sortedNamesCount[i][0] + "** `" + sortedNamesCount[i][1] + "`\n";
         }
+
+        leaderboardString.trim()
+        leaderboardEmbed.setColor("#156385")
+        leaderboardEmbed.setDescription(leaderboardString)
 
         if (show_leaderboard) {
             message.channel.send(leaderboardString);
